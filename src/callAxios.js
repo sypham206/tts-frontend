@@ -1,6 +1,6 @@
 import axios from "axios";
-// export const API_URL = "http://tts-banking.herokuapp.com";
-export const API_URL = "http://tts-bank.herokuapp.com";
+// export const API_URL = "https://tts-banking.herokuapp.com";
+export const API_URL = "https://tts-bank.herokuapp.com";
 export const connector = axios.create({ baseURL: API_URL });
 // const token = localStorage.getItem("token");
 const accessToken = localStorage.getItem("accessToken");
