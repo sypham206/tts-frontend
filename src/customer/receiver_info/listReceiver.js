@@ -27,7 +27,7 @@ export default class receiversComponent extends React.Component {
             listReceivers: [],
             listBanks: DB.listBanks(),
             loaded: false,
-            timeout: new Date().getTime() + 10 * 1000,
+            lasttime: new Date().getTime(),
             nameReceiver2: '',
             numberReceiver: '1345',
             remindReceiver: '',
@@ -139,7 +139,9 @@ export default class receiversComponent extends React.Component {
         let isExist = false;
         this.state.listReceivers.forEach(element => {
             if (element.number == this.state.numberReceiver) 
-                isExist = true;    
+                isExist = true;
+            
+
         })
 
         // Xử lí điều kiện
@@ -194,38 +196,35 @@ export default class receiversComponent extends React.Component {
     }
 
     getDatabase = async (e) => { // Refresh token để gọi backend
-        this.setState({loaded: true});
-        DB.refreshToken();
-        // Call axios
-        const response = await connector.get("/list-receiver1", {}).then((response) => {
-            console.log("response", response);
-            let listReceivers = [];
-            response.data.forEach(element => {
-                listReceivers = listReceivers.concat([{
-                        remind_name: element.remind_name,
-                        number: element.receiver_account_number,
-                        bankCode: element.bank_code
-                    }]);
-            });
+        if (new Date().getTime() > this.state.lasttime + 5 * 1000 || this.state.loaded == false) {
+            this.setState({loaded: true, lasttime: new Date().getTime()})
+            DB.refreshToken();
+            // Call axios
+            const response = await connector.get("/list-receiver1", {}).then((response) => {
+                console.log("response", response);
+                let listReceivers = [];
+                response.data.forEach(element => {
+                    listReceivers = listReceivers.concat([{
+                            remind_name: element.remind_name,
+                            number: element.receiver_account_number,
+                            bankCode: element.bank_code
+                        }]);
+                });
 
-            // Lưu vào state
-            this.setState({listReceivers: listReceivers})
-        }, (error) => {
-            console.log("Error! Infor: ", error.response);
-            alert('Lỗi xảy ra!');
-        });
+                // Lưu vào state
+                this.setState({listReceivers: listReceivers})
+            }, (error) => {
+                console.log("Error! Infor: ", error.response);
+                alert('Lỗi xảy ra!');
+            });
+        }
     }
     render = () => { // Realtime
-        if (new Date().getTime() > this.state.timeout || this.state.loaded == false) { // Cập nhật DB mới và khởi tạo lại timeout
-            this.setState({
-                timeout: new Date().getTime() + 10 * 1000
-            });
+        if (this.state.loaded == false)
             this.getDatabase();
-        } else { // Chạy với mục đích dùng setState để chạy lại render()
-            setTimeout(function () {
-                this.setState({loaded: true});
-            }.bind(this), 10 * 1000);
-        }
+        setTimeout(function () {
+            this.getDatabase();
+        }.bind(this), 10 * 1000);
 
         // Tải lên giao diện
         return (
@@ -492,7 +491,6 @@ export default class receiversComponent extends React.Component {
                         </div>
                     </Form>
                 </div>
-
             </div>
         );
     }

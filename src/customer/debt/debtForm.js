@@ -40,24 +40,29 @@ export default class debtsComponent extends React.Component {
             listDebts2: [],
             listReceivers: [],
             loaded: false,
-            timeout: new Date().getTime() + 10 * 1000
+            lasttime: new Date().getTime(),
+            codeTransaction1: '',
+            idTransaction1: null,
+            codeTransaction2: '',
+            idTransaction2: null,
+            notify_message: '',
+            otp: ''
         }
         this.onChange = this.onChange.bind(this);
         this.selectReceiverChange = this.selectReceiverChange.bind(this);
         this.submitForm = this.submitForm.bind(this);
         this.ActionAdd = this.ActionAdd.bind(this);
         this.getDatabase = this.getDatabase.bind(this);
-        this.ActionCancel1 = this.ActionCancel1.bind(this);
-        this.ActionCancel2 = this.ActionCancel2.bind(this);
-
+        this.actionDelete1 = this.actionDelete1.bind(this);
 
     }
     onChange = async (e) => {
         this.setState({[e.target.name]: e.target.value})
         // Nếu sự kiện ở thẻ Input Account Receiver thì thay đổi giá trị Name Receiver và làm rỗng thẻ gợi ý
-        if (e.target.name == "numberReceiver") {
-            // Call axios
-            const response = await connector.get(`/account/${e.target.value}`, {}).then((response) => {
+        if (e.target.name == "numberReceiver") { // Call axios
+            const response = await connector.get(`/account/${
+                e.target.value
+            }`, {}).then((response) => {
                 console.log("response", response);
                 let nameReceiver = '';
                 if (response.data.status == 'OK') {
@@ -96,60 +101,139 @@ export default class debtsComponent extends React.Component {
         this.setState({activeTab: val})
     }
 
-    ActionPay(e) {
+    actionPay = async (idTransaction, codeTransaction) => { // Open form
+        const {formID} = document.forms;
+        formID.reset();
+        document.getElementById('formPay').style.display = "block";
+
+        // Gửi yêu cầu để lấy mã OTP cho form Pay
+        /* .. code here .. */
+
+        // Lấy giá trị STK
+        this.setState({idTransaction1: idTransaction, codeTransaction1: codeTransaction, otp: ''});
+        document.getElementById('formPay').focus();
+    }
+
+    ActionCancelPayForm(e) {
         e.preventDefault();
-        alert('Thanh toán nhắc nợ');
+        document.getElementById('formPay').style.display = "none";
+        // document.getElementById('main').style.display = "block";
     }
 
-    ActionCancel1 = async (id) => {
-        alert(id);
-        let reqBody = {
-            creditor_account_number: '',
-            debtor_account_number: '',
-            money: '',
-            notify_message: 'Xóa thôi ai biết đâu :('
-        }
-        this.state.listDebts1.forEach(element => {
-            if (id == element.debt_id) {
-                reqBody = {
-                    creditor_account_number: element.creditor_account_number,
-                    debtor_account_number: element.debtor_account_number,
-                    money: element.money,
-                    notify_message: 'Xóa thôi ai biết đâu :('
-                }
+    submitPayForm = async (e) => {
+        e.preventDefault()
+        // Thanh toán ..
 
-            }                
-        });
-
-        // Call axios
-        const response = await connector.post(`/debt/delete1/${id}`, reqBody).then((response) => {
-            console.log("response", response);
-
-            // Lưu vào state
-            this.setState({loaded: true})
-        }, (error) => {
-            console.log("Error! Infor: ", error.response);
-            alert('Lỗi xảy ra!');
-        });
-    }
-
-    ActionCancel2 = async (id) => {
-        alert(id);
-        // Call axios
+        /* Chưa tìm thấy .. */
         const reqBody = {
-            notify_message: 'Xóa thôi ai biết đâu :('
+            notify_message: this.state.notify_message
         }
-        const response = await connector.post(`/debt/delete2/${id}`, reqBody).then((response) => {
-            console.log("response", response);
 
-            // Lưu vào state
-            this.setState({loaded: false})
+        const response = await connector.post(`/debt/delete1/${
+            this.state.idTransaction1
+        }`, reqBody).then((response) => {
+            console.log("response", response);
+            if (response.data.message == 'OK') { // Show message
+                alert('Xóa thành công!');
+            } else {
+                alert('Xóa thất bại!');
+            }
         }, (error) => {
-            console.log("Error! Infor: ", error.response);
-            alert('Lỗi xảy ra!');
+            console.log("Error! Xóa nhắc nợ: ", error.response);
+            alert('Lỗi xóa thất bại!');
         });
 
+        this.getDatabase();
+        // Đóng form
+        document.getElementById('formDelete1').style.display = "none";
+    }
 
+    actionDelete1 = async (idTransaction, codeTransaction) => { // Open form
+        const {formID} = document.forms;
+        formID.reset();
+        document.getElementById('formDelete1').style.display = "block";
+
+        // Lấy giá trị STK
+        this.setState({idTransaction1: idTransaction, codeTransaction1: codeTransaction, notify_message: ''});
+        document.getElementById('formDelete1').focus();
+
+    }
+
+    ActionCancelDeleteForm1(e) {
+        e.preventDefault();
+        document.getElementById('formDelete1').style.display = "none";
+        // document.getElementById('main').style.display = "block";
+    }
+
+    submitDeleteForm1 = async (e) => {
+        e.preventDefault()
+        // Thực hiện sửa tên gợi nhớ
+        // alert(this.state.numberReceiver);
+        const reqBody = {
+            notify_message: this.state.notify_message
+        }
+
+        const response = await connector.post(`/debt/delete1/${
+            this.state.idTransaction1
+        }`, reqBody).then((response) => {
+            console.log("response", response);
+            if (response.data.message == 'OK') { // Show message
+                alert('Xóa thành công!');
+            } else {
+                alert('Xóa thất bại!');
+            }
+        }, (error) => {
+            console.log("Error! Xóa nhắc nợ: ", error.response);
+            alert('Lỗi xóa thất bại!');
+        });
+
+        this.getDatabase();
+        // Đóng form
+        document.getElementById('formDelete1').style.display = "none";
+    }
+
+    actionDelete2 = async (idTransaction, codeTransaction) => { // Open form
+        const {formID} = document.forms;
+        formID.reset();
+        document.getElementById('formDelete2').style.display = "block";
+
+        // Lấy giá trị STK
+        this.setState({idTransaction2: idTransaction, codeTransaction2: codeTransaction, notify_message: ''});
+        document.getElementById('formDelete2').focus();
+
+    }
+
+    ActionCancelDeleteForm2(e) {
+        e.preventDefault();
+        document.getElementById('formDelete2').style.display = "none";
+        // document.getElementById('main').style.display = "block";
+    }
+
+    submitDeleteForm2 = async (e) => {
+        e.preventDefault()
+        // Thực hiện sửa tên gợi nhớ
+        // alert(this.state.numberReceiver);
+        const reqBody = {
+            notify_message: this.state.notify_message
+        }
+
+        const response = await connector.post(`/debt/delete2/${
+            this.state.idTransaction2
+        }`, reqBody).then((response) => {
+            console.log("response", response);
+            if (response.data.message == 'OK') { // Show message
+                alert('Xóa thành công!');
+            } else {
+                alert('Xóa thất bại!');
+            }
+        }, (error) => {
+            console.log("Error! Xóa nhắc nợ: ", error.response);
+            alert('Lỗi xóa thất bại!');
+        });
+
+        this.getDatabase();
+        // Đóng form
+        document.getElementById('formDelete2').style.display = "none";
     }
 
     ActionAdd(e) {
@@ -179,6 +263,9 @@ export default class debtsComponent extends React.Component {
             alert('Lỗi gửi nhắc nợ!');
         });
 
+        // Cập nhật dữ liệu
+        this.getDatabase();
+
         // Chuyển qua màn hình thông báo
         this.setState({activeTab: 1});
     }
@@ -192,81 +279,78 @@ export default class debtsComponent extends React.Component {
     }
 
     getDatabase = async (e) => { // Refresh token để gọi backend trước
-        this.setState({loaded: true})
-        DB.refreshToken();
-        // Call axios
-        const response = await connector.get("/list-receiver1", {}).then((response) => {
-            console.log("response", response);
-            let listReceivers = [];
-            response.data.forEach(element => {
-                listReceivers = listReceivers.concat([{
-                        remind_name: element.remind_name,
-                        number: element.receiver_account_number,
-                        bankCode: element.bank_code
-                    }]);
-            });
+        if (new Date().getTime() > this.state.lasttime + 5 * 1000 || this.state.loaded == false) {
+            this.setState({loaded: true, lasttime: new Date().getTime()})
+            DB.refreshToken();
+            // Call axios
+            const response = await connector.get("/list-receiver1", {}).then((response) => {
+                console.log("response", response);
+                let listReceivers = [];
+                response.data.forEach(element => {
+                    listReceivers = listReceivers.concat([{
+                            remind_name: element.remind_name,
+                            number: element.receiver_account_number,
+                            bankCode: element.bank_code
+                        }]);
+                });
 
-            // Lưu vào state
-            this.setState({listReceivers: listReceivers})
-        }, (error) => {
-            console.log("Error! Infor: ", error.response);
-            alert('Lỗi xảy ra!');
-        });
-        const response1 = await connector.get("/debt/view1", {}).then((response) => {
-            console.log("response", response);
-            let listDebts1 = [];
-            response.data.forEach(element => {
-                listDebts1 = listDebts1.concat([{
-                        id: element.debt_id,
-                        code: element._id,
-                        number: element.debtor_account_number,
-                        name: element.debtor_fullname,
-                        money: element.money,
-                        content: element.message,
-                        time: element.created_at
-                    }]);
+                // Lưu vào state
+                this.setState({listReceivers: listReceivers})
+            }, (error) => {
+                console.log("Error! Infor: ", error.response);
+                alert('Lỗi xảy ra!');
             });
+            const response1 = await connector.get("/debt/view1", {}).then((response) => {
+                console.log("response", response);
+                let listDebts1 = [];
+                response.data.forEach(element => {
+                    listDebts1 = listDebts1.concat([{
+                            id: element.debt_id,
+                            code: element._id,
+                            number: element.debtor_account_number,
+                            name: element.debtor_fullname,
+                            money: element.money,
+                            content: element.message,
+                            time: element.created_at
+                        }]);
+                });
 
-            // Lưu vào state
-            this.setState({listDebts1: listDebts1})
-        }, (error) => {
-            console.log("Error! Infor: ", error.response);
-            alert('Lỗi xảy ra (view1)!');
-        });
-        const response2 = await connector.get("/debt/view2", {}).then((response) => {
-            console.log("response", response);
-            let listDebts2 = [];
-            response.data.forEach(element => {
-                listDebts2 = listDebts2.concat([{
-                        id: element.debt_id,
-                        code: element._id,
-                        number: element.creditor_account_number,
-                        name: element.creditor_fullname, // lỗi thiếu db, đúng ra là creditor_fullname
-                        money: element.money,
-                        content: element.message,
-                        time: element.created_at
-                    }]);
+                // Lưu vào state
+                this.setState({listDebts1: listDebts1})
+            }, (error) => {
+                console.log("Error! Infor: ", error.response);
+                alert('Lỗi xảy ra (view1)!');
             });
+            const response2 = await connector.get("/debt/view2", {}).then((response) => {
+                console.log("response", response);
+                let listDebts2 = [];
+                response.data.forEach(element => {
+                    listDebts2 = listDebts2.concat([{
+                            id: element.debt_id,
+                            code: element._id,
+                            number: element.creditor_account_number,
+                            name: element.creditor_fullname, // lỗi thiếu db, đúng ra là creditor_fullname
+                            money: element.money,
+                            content: element.message,
+                            time: element.created_at
+                        }]);
+                });
 
-            // Lưu vào state
-            this.setState({listDebts2: listDebts2})
-        }, (error) => {
-            console.log("Error! Infor: ", error.response);
-            alert('Lỗi xảy ra (view2)!');
-        });
+                // Lưu vào state
+                this.setState({listDebts2: listDebts2})
+            }, (error) => {
+                console.log("Error! Infor: ", error.response);
+                alert('Lỗi xảy ra (view2)!');
+            });
+        }
     }
 
     render = () => { // Realtime
-        if (new Date().getTime() > this.state.timeout || this.state.loaded == false) { // Cập nhật DB mới và khởi tạo lại timeout
-            this.setState({
-                timeout: new Date().getTime() + 10 * 1000
-            });
+        if (this.state.loaded == false)
             this.getDatabase();
-        } else { // Chạy với mục đích dùng setState để chạy lại render()
-            setTimeout(function () {
-                this.setState({loaded: true});
-            }.bind(this), 10 * 1000);
-        }
+        // setTimeout(function () {
+        //     this.getDatabase();
+        // }.bind(this), 10 * 1000);
 
         // Tải lên giao diện
         return (
@@ -393,23 +477,14 @@ export default class debtsComponent extends React.Component {
                                                                     {textAlign: 'center'}
                                                                 }>
                                                                     <button onClick={
-                                                                            this.ActionPay
-                                                                        }
-                                                                        style={
-                                                                            {
-                                                                                fontSize: '24px',
-                                                                                marginRight: '10px'
-                                                                            }
-                                                                    }><MdPayment/></button>
-                                                                    <button onClick={
                                                                             () => {
-                                                                                this.ActionCancel1(item.id)
+                                                                                this.actionDelete2(item.id, item.code)
                                                                             }
                                                                         }
                                                                         style={
                                                                             {
-                                                                                fontSize: '24px',
-                                                                                marginLeft: '10px'
+                                                                                fontSize: '18px',
+                                                                                marginLeft: '7px'
                                                                             }
                                                                     }><AiOutlineDelete/></button>
                                                                 </td>
@@ -472,24 +547,24 @@ export default class debtsComponent extends React.Component {
                                                                     {textAlign: 'center'}
                                                                 }>
                                                                     <button onClick={
-                                                                            this.ActionPay
+                                                                            this.actionPay
                                                                         }
                                                                         style={
                                                                             {
-                                                                                fontSize: '24px',
-                                                                                marginRight: '10px'
+                                                                                fontSize: '18px',
+                                                                                marginRight: '7px'
                                                                             }
                                                                     }><MdPayment/></button>
                                                                     <button value={
                                                                             item.id
                                                                         }
                                                                         onClick={
-                                                                            () => this.ActionCancel(item.id)
+                                                                            () => this.actionDelete1(item.id, item.code)
                                                                         }
                                                                         style={
                                                                             {
-                                                                                fontSize: '24px',
-                                                                                marginLeft: '10px'
+                                                                                fontSize: '18px',
+                                                                                marginLeft: '7px'
                                                                             }
                                                                     }><AiOutlineDelete/></button>
                                                                 </td>
@@ -559,29 +634,31 @@ export default class debtsComponent extends React.Component {
                                                 }>
                                                     {
                                                     [{
-                                                        remind_name: "Chọn tài khoản gợi nhớ",
-                                                        number: 0,
-                                                        bankCode: '0'
-                                                    }].concat(this.state.listReceivers).map((item, index) => {
+                                                            remind_name: "Chọn tài khoản gợi nhớ",
+                                                            number: 0,
+                                                            bankCode: '0'
+                                                        }].concat(this.state.listReceivers).map((item, index) => {
                                                         if (item.bankCode == "GO" || item.remind_name == "Chọn tài khoản gợi nhớ") 
-                                                        return(index == 0) ? (
-                                                            <option value={
-                                                                item.number
-                                                            }>
-                                                                {
-                                                                item.remind_name
-                                                            }</option>
-                                                        ) : (
-                                                            <option value={
-                                                                item.number
-                                                            }>
-                                                                {
-                                                                item.number + ' '
-                                                            }
-                                                                - {
-                                                                item.remind_name
-                                                            }</option>
-                                                        );                                                     
+                                                            return(index == 0) ? (
+                                                                <option value={
+                                                                    item.number
+                                                                }>
+                                                                    {
+                                                                    item.remind_name
+                                                                }</option>
+                                                            ) : (
+                                                                <option value={
+                                                                    item.number
+                                                                }>
+                                                                    {
+                                                                    item.number + ' '
+                                                                }
+                                                                    - {
+                                                                    item.remind_name
+                                                                }</option>
+                                                            );
+                                                        
+
                                                     })
                                                 } </Input>
                                             </Col>
@@ -781,6 +858,214 @@ export default class debtsComponent extends React.Component {
                         </TabPane>
                     </TabContent>
                 </div>
+                <div id={'formDelete1'}
+                    style={
+                        {
+                            display: 'none',
+                            border: '2px solid green',
+                            borderRadius: '5px',
+                            padding: '2em',
+                            width: '80%',
+                            textAlign: 'center',
+                            backgroundColor: 'white',
+                            position: 'absolute',
+                            zIndex: '1',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%,-50%)'
+                        }
+                }>
+                    <Form id={'formID'}
+                        onSubmit={
+                            this.submitDeleteForm1
+                    }>
+                        <Card>
+                            <CardHeader>
+                                <b style={
+                                    {
+                                        fontStyle: 'italic',
+                                        fontSize: '18px'
+                                    }
+                                }>Mã giao dịch: <u style={
+                                    {
+                                        color: 'red'
+                                    }
+                                }>{
+                                    this.state.codeTransaction1
+                                }</u></b>
+                            </CardHeader>
+                            <CardBody>
+                                <FormGroup row>
+                                    <Col md="3" className="d-flex p-3">
+                                        <Label>Lời nhắn</Label>
+                                    </Col>
+                                    <Col xs="12" md="6">
+                                        <Input type="text" name="notify_message"
+                                            onChange={
+                                                this.onChange
+                                            }
+                                            value={
+                                                this.state.notify_message
+                                        }></Input>
+                                    </Col>
+                                </FormGroup>
+                            </CardBody>
+                        </Card>
+                        {/* {Thêm người nhận}*/}
+                        <br/>
+                        <div style={
+                            {textAlign: 'center'}
+                        }>
+                            <Button type={'submit'}
+                                disabled={false}>GỬI</Button>
+                            <Button onClick={
+                                    this.ActionCancelDeleteForm1
+                                }
+                                style={
+                                    {marginLeft: '5px'}
+                            }>ĐÓNG</Button>
+                        </div>
+                    </Form>
+                </div>
+                <div id={'formDelete2'}
+                    style={
+                        {
+                            display: 'none',
+                            border: '2px solid green',
+                            borderRadius: '5px',
+                            padding: '2em',
+                            width: '80%',
+                            textAlign: 'center',
+                            backgroundColor: 'white',
+                            position: 'absolute',
+                            zIndex: '1',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%,-50%)'
+                        }
+                }>
+                    <Form id={'formID'}
+                        onSubmit={
+                            this.submitDeleteForm2
+                    }>
+                        <Card>
+                            <CardHeader>
+                                <b style={
+                                    {
+                                        fontStyle: 'italic',
+                                        fontSize: '18px'
+                                    }
+                                }>Mã giao dịch: <u style={
+                                    {
+                                        color: 'red'
+                                    }
+                                }>{
+                                    this.state.codeTransaction2
+                                }</u></b>
+                            </CardHeader>
+                            <CardBody>
+                                <FormGroup row>
+                                    <Col md="3" className="d-flex p-3">
+                                        <Label>Lời nhắn</Label>
+                                    </Col>
+                                    <Col xs="12" md="6">
+                                        <Input type="text" name="notify_message"
+                                            onChange={
+                                                this.onChange
+                                            }
+                                            value={
+                                                this.state.notify_message
+                                        }></Input>
+                                    </Col>
+                                </FormGroup>
+                            </CardBody>
+                        </Card>
+                        {/* {Thêm người nhận}*/}
+                        <br/>
+                        <div style={
+                            {textAlign: 'center'}
+                        }>
+                            <Button type={'submit'}
+                                disabled={false}>GỬI</Button>
+                            <Button onClick={
+                                    this.ActionCancelDeleteForm2
+                                }
+                                style={
+                                    {marginLeft: '5px'}
+                            }>ĐÓNG</Button>
+                        </div>
+                    </Form>
+                </div>
+                <div id={'formPay'}
+                    style={
+                        {
+                            display: 'none',
+                            border: '2px solid green',
+                            borderRadius: '5px',
+                            padding: '2em',
+                            width: '80%',
+                            textAlign: 'center',
+                            backgroundColor: 'white',
+                            position: 'absolute',
+                            zIndex: '1',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%,-50%)'
+                        }
+                }>
+                    <Form id={'formID'}
+                        onSubmit={
+                            this.submitPayForm
+                    }>
+                        <Card>
+                            <CardHeader>
+                                <b style={
+                                    {
+                                        fontStyle: 'italic',
+                                        fontSize: '18px'
+                                    }
+                                }>Mã giao dịch: <u style={
+                                    {
+                                        color: 'red'
+                                    }
+                                }>{
+                                    this.state.codeTransaction1
+                                }</u></b>
+                            </CardHeader>
+                            <CardBody>
+                                <FormGroup row>
+                                    <Col md="3" className="d-flex p-3">
+                                        <Label>OTP</Label>
+                                    </Col>
+                                    <Col xs="12" md="6">
+                                        <Input type="text" name="otp"
+                                            onChange={
+                                                this.onChange
+                                            }
+                                            value={
+                                                this.state.otp
+                                        }></Input>
+                                    </Col>
+                                </FormGroup>
+                            </CardBody>
+                        </Card>
+                        {/* {Thêm người nhận}*/}
+                        <br/>
+                        <div style={
+                            {textAlign: 'center'}
+                        }>
+                            <Button type={'submit'}
+                                disabled={false}>GỬI</Button>
+                            <Button onClick={
+                                    this.ActionCancelPayForm
+                                }
+                                style={
+                                    {marginLeft: '5px'}
+                            }>ĐÓNG</Button>
+                        </div>
+                    </Form>
+                </div>
+                
             </div>
         );
     }

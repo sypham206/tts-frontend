@@ -33,7 +33,7 @@ export default class TransferForm extends React.Component {
             listAccounts: [],
             listReceivers: [],
             loaded: false,
-            timeout: new Date().getTime() + 10 * 1000,
+            lasttime: new Date().getTime(),
             activeTab: 0,
             numberAccount: '',
             balanceAccount: 0,
@@ -60,8 +60,7 @@ export default class TransferForm extends React.Component {
         this.setState({[e.target.name]: e.target.value})
 
         // Nếu sự kiện ở thẻ Input Account Receiver thì thay đổi giá trị Name Receiver và làm rỗng thẻ gợi ý
-        if (e.target.name == "numberReceiver") {
-            // value = 0 ứng với option gợi ý
+        if (e.target.name == "numberReceiver") { // value = 0 ứng với option gợi ý
             document.getElementById('selectReceiver').value = '0';
             // Xóa rỗng nameReceiver
             this.setState({nameReceiver: ''});
@@ -88,7 +87,7 @@ export default class TransferForm extends React.Component {
             // value = 0 ứng với option gợi ý (dòng 155)
             document.getElementById('selectReceiver').value = '0';
         }
-      }
+    }
 
     selectAccountChange(e) {
         const accountSelected = e.target.value;
@@ -224,6 +223,7 @@ export default class TransferForm extends React.Component {
             if (element.number == this.state.numberReceiver) 
                 isExist = true;
             
+
         })
 
         // Xử lí điều kiện
@@ -254,57 +254,54 @@ export default class TransferForm extends React.Component {
     }
 
     getDatabase = async (e) => { // Refresh token để gọi backend trước
-        this.setState({loaded: true});
-        DB.refreshToken();
-        // Call axios - listAccounts
-        const response = await connector.get("/account", {}).then((response) => {
-            console.log("response", response);
-            const listAccounts = [{
-                    number: response.data.rows.account_number,
-                    balance: response.data.rows.balance,
-                    type: "Tài khoản thanh toán"
-                }];
+        if (new Date().getTime() > this.state.lasttime + 5 * 1000 || this.state.loaded == false) {
+            this.setState({loaded: true, lasttime: new Date().getTime()})
+            DB.refreshToken();
+            // Call axios - listAccounts
+            const response = await connector.get("/account", {}).then((response) => {
+                console.log("response", response);
+                const listAccounts = [{
+                        number: response.data.rows.account_number,
+                        balance: response.data.rows.balance,
+                        type: "Tài khoản thanh toán"
+                    }];
 
-            // Lưu vào state
-            this.setState({listAccounts: listAccounts, numberAccount: response.data.rows.account_number, balanceAccount: response.data.rows.balance})
-        }, (error) => {
-            console.log("Error! Infor: ", error.response);
-            const loi = 'Lỗi xảy ra. accessToken: ';
-            const str = loi.concat(localStorage.getItem("accessToken"));
-            alert(str);
-        });
-
-        // Call axios - listReceivers
-        const response1 = await connector.get("/list-receiver1", {}).then((response) => {
-            console.log("response", response);
-            let listReceivers = [];
-            response.data.forEach(element => {
-                listReceivers = listReceivers.concat([{
-                        remind_name: element.remind_name,
-                        number: element.receiver_account_number,
-                        bankCode: element.bank_code
-                    }]);
+                // Lưu vào state
+                this.setState({listAccounts: listAccounts, numberAccount: response.data.rows.account_number, balanceAccount: response.data.rows.balance})
+            }, (error) => {
+                console.log("Error! Infor: ", error.response);
+                const loi = 'Lỗi xảy ra. accessToken: ';
+                const str = loi.concat(localStorage.getItem("accessToken"));
+                alert(str);
             });
 
-            // Lưu vào state
-            this.setState({listReceivers: listReceivers})
-        }, (error) => {
-            console.log("Error! Infor: ", error.response);
-            alert('Lỗi xảy ra!');
-        });
+            // Call axios - listReceivers
+            const response1 = await connector.get("/list-receiver1", {}).then((response) => {
+                console.log("response", response);
+                let listReceivers = [];
+                response.data.forEach(element => {
+                    listReceivers = listReceivers.concat([{
+                            remind_name: element.remind_name,
+                            number: element.receiver_account_number,
+                            bankCode: element.bank_code
+                        }]);
+                });
+
+                // Lưu vào state
+                this.setState({listReceivers: listReceivers})
+            }, (error) => {
+                console.log("Error! Infor: ", error.response);
+                alert('Lỗi xảy ra!');
+            });
+        }
     }
 
     render() { // Realtime
-        if (new Date().getTime() > this.state.timeout || this.state.loaded == false) { // Cập nhật DB mới và khởi tạo lại timeout
-            this.setState({
-                timeout: new Date().getTime() + 10 * 1000
-            });
+        if (this.state.loaded == false)
             this.getDatabase();
-        } else { // Chạy với mục đích dùng setState để chạy lại render()
-            setTimeout(function () {
-                this.setState({loaded: true});
-            }.bind(this), 10 * 1000);
-        }
+        setTimeout(function () {
+            this.getDatabase();
+        }.bind(this), 10 * 1000);
 
         // Người nhận
         // Thanh toán phí
@@ -447,7 +444,9 @@ export default class TransferForm extends React.Component {
                                                     onChange={
                                                         this.onChange
                                                     }
-                                                    onKeyDown={this.onKeyDown}
+                                                    onKeyDown={
+                                                        this.onKeyDown
+                                                    }
                                                     value={
                                                         this.state.numberReceiver
                                                 }></Input>

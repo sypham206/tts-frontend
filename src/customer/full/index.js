@@ -1,9 +1,9 @@
 import React from 'react';
-import './css/style.css';
-import './css/flaticon.css';
-import './css/magnific-popup.css';
-import './css/owl.theme.default.min.css';
-import './css/animate.css';
+import './../../css/style.css';
+import './../../css/flaticon.css';
+import './../../css/magnific-popup.css';
+import './../../css/owl.theme.default.min.css';
+import './../../css/animate.css';
 
 function Full() {
   return (

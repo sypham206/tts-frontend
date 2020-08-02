@@ -16,46 +16,41 @@ export default class accountsComponent extends React.Component {
         this.state = {
             listAccounts: [],
             loaded: false,
-            timeout: new Date().getTime() + 10 * 1000
+            lasttime: new Date().getTime()
         }
         this.getDatabase = this.getDatabase.bind(this);
     }
 
     getDatabase = async (e) => { // Refresh token để gọi backend trước
-        this.setState({loaded: true});
-        DB.refreshToken();
-        // Call axios
-        const response = await connector.get("/account", {}).then((response) => {
-            console.log("response", response);
-            const listAccounts = [{
-                    number: response.data.rows.account_number,
-                    balance: response.data.rows.balance,
-                    type: "Tài khoản thanh toán"
-                }];
+        if (new Date().getTime() > this.state.lasttime + 5 * 1000 || this.state.loaded == false) {
+            this.setState({loaded: true, lasttime: new Date().getTime()})
+            DB.refreshToken();
+            // Call axios
+            const response = await connector.get("/account", {}).then((response) => {
+                console.log("response", response);
+                const listAccounts = [{
+                        number: response.data.rows.account_number,
+                        balance: response.data.rows.balance,
+                        type: "Tài khoản thanh toán"
+                    }];
 
-            // Lưu vào state
-            this.setState({listAccounts: listAccounts})
-        }, (error) => {
-            console.log("Error! Infor: ", error.response);
-            const loi = 'Lỗi xảy ra. accessToken: ';
-            const str = loi.concat(localStorage.getItem("accessToken")); 
-            alert(str);
-        });
+                // Lưu vào state
+                this.setState({listAccounts: listAccounts})
+            }, (error) => {
+                console.log("Error! Infor: ", error.response);
+                const loi = 'Lỗi xảy ra. accessToken: ';
+                const str = loi.concat(localStorage.getItem("accessToken"));
+                alert(str);
+            });
+        }
     }
 
     render = () => { // Realtime
-        if (new Date().getTime() > this.state.timeout || this.state.loaded == false) {
-            // Cập nhật DB mới và khởi tạo lại timeout
-            this.setState({
-                timeout: new Date().getTime() + 10 * 1000
-            });
+        if (this.state.loaded == false)
             this.getDatabase();
-        } else {
-            // Chạy với mục đích dùng setState để chạy lại render()
-            setTimeout(function () {
-                this.setState({loaded: true});
-            }.bind(this), 10 * 1000);
-        }
+        setTimeout(function () {
+            this.getDatabase();
+        }.bind(this), 10 * 1000);
 
         // Tải lên giao diện
         return (

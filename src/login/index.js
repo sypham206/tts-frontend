@@ -62,78 +62,80 @@ export default class Login extends Component {
     }
 
     render() {
-        return (<div>
-            <title>Login TTS-Banking</title>
-            <meta charSet="UTF-8"/>
-            <meta name="viewport" content="width=device-width, initial-scale=1"/> {/*===============================================================================================*/}
-            <link rel="icon" type="image/png" href="images/icons/favicon.ico"/> {/*===============================================================================================*/}
-            <div className="limiter">
-                <div className="container-page">
-                    <div className="wrap-body p-l-85 p-r-85 p-t-55 p-b-55">
-                        <form onSubmit={
-                                this.submitForm
-                            }
-                            className="login100-form validate-form flex-sb flex-w">
-                            <span className="login100-form-title p-b-32">
-                                ĐĂNG NHẬP
-                            </span>
-                            <span className="txt1 p-b-11">
-                                Tên đăng nhập
-                            </span>
-                            <div className="wrap-input100 validate-input m-b-36" data-validate="Username is required">
-                                <input className="input100" type="text" name="username"
-                                    value={
-                                        this.state.username
-                                    }
-                                    onChange={
-                                        this.onChange
-                                    }/>
-                                <span className="focus-input100"/>
-                            </div>
-                            <span className="txt1 p-b-11">
-                                Mật khẩu
-                            </span>
-                            <div className="wrap-input100 validate-input m-b-12" data-validate="Password is required">
-                                <span className="btn-show-pass">
-                                    <i className="fa fa-eye"/>
+        return (
+            <div>
+                <title>Login TTS-Banking</title>
+                <meta charSet="UTF-8"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1"/> {/*===============================================================================================*/}
+                <link rel="icon" type="image/png" href="images/icons/favicon.ico"/> {/*===============================================================================================*/}
+                <div className="limiter">
+                    <div className="container-page">
+                        <div className="wrap-body p-l-85 p-r-85 p-t-55 p-b-55">
+                            <form onSubmit={
+                                    this.submitForm
+                                }
+                                className="login100-form validate-form flex-sb flex-w">
+                                <span className="login100-form-title p-b-32">
+                                    ĐĂNG NHẬP
                                 </span>
-                                <input className="input100" type="password" name="password"
-                                    value={
-                                        this.state.password
-                                    }
-                                    onChange={
-                                        this.onChange
-                                    }/>
-                                <span className="focus-input100"/>
-                            </div>
-                            <div className="flex-sb-m w-full p-b-48">
-                                <div className="contact100-form-checkbox">
-                                    <input className="input-checkbox100" id="ckb1" type="checkbox" name="remember-me"/>
-                                    <label className="label-checkbox100" htmlFor="ckb1">
-                                        Lưu tài khoản
-                                    </label>
+                                <span className="txt1 p-b-11">
+                                    Tên đăng nhập
+                                </span>
+                                <div className="wrap-input100 validate-input m-b-36" data-validate="Username is required">
+                                    <input className="input100" type="text" name="username"
+                                        value={
+                                            this.state.username
+                                        }
+                                        onChange={
+                                            this.onChange
+                                        }/>
+                                    <span className="focus-input100"/>
                                 </div>
-                                <div>
-                                    <a href="/recovery" className="txt3">
-                                        Quên mật khẩu?
-                                    </a>
+                                <span className="txt1 p-b-11">
+                                    Mật khẩu
+                                </span>
+                                <div className="wrap-input100 validate-input m-b-12" data-validate="Password is required">
+                                    <span className="btn-show-pass">
+                                        <i className="fa fa-eye"/>
+                                    </span>
+                                    <input className="input100" type="password" name="password"
+                                        value={
+                                            this.state.password
+                                        }
+                                        onChange={
+                                            this.onChange
+                                        }/>
+                                    <span className="focus-input100"/>
                                 </div>
-                            </div>
-                            <div className="container-page-form-btn">
-                                <button className="login100-form-btn">
-                                    Đăng nhập
-                                </button>
-                            </div>
-                        </form>
+                                <div className="flex-sb-m w-full p-b-48">
+                                    <div className="contact100-form-checkbox">
+                                        <input className="input-checkbox100" id="ckb1" type="checkbox" name="remember-me"/>
+                                        <label className="label-checkbox100" htmlFor="ckb1">
+                                            Lưu tài khoản
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <a href="/recovery" className="txt3">
+                                            Quên mật khẩu?
+                                        </a>
+                                    </div>
+                                </div>
+                                <div className="container-page-form-btn">
+                                    <button className="login100-form-btn">
+                                        Đăng nhập
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div id="dropDownSelect1"/> {/*===============================================================================================*/}
-            {/*===============================================================================================*/}
-            {/*===============================================================================================*/}
-            {/*===============================================================================================*/}
-            {/*===============================================================================================*/}
-            {/*===============================================================================================*/}
-            {/*===============================================================================================*/} </div>)
+                <div id="dropDownSelect1"/> {/*===============================================================================================*/}
+                {/*===============================================================================================*/}
+                {/*===============================================================================================*/}
+                {/*===============================================================================================*/}
+                {/*===============================================================================================*/}
+                {/*===============================================================================================*/}
+                {/*===============================================================================================*/} </div>
+        )
     }
 }
