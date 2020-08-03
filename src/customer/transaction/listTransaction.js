@@ -12,9 +12,6 @@ import {
     Label,
     Input
 } from "reactstrap";
-import Pagination from "react-js-pagination";
-require('bootstrap/dist/css/bootstrap.min.css');
-
 
 export default class TransactionForm extends React.Component {
     constructor(props) {
@@ -287,13 +284,6 @@ export default class TransactionForm extends React.Component {
 
                                         })
                                     } </tbody>
-                                <Pagination
-          activePage={this.state.activePage}
-          itemsCountPerPage={10}
-          totalItemsCount={450}
-          pageRangeDisplayed={5}
-          onChange={this.handlePageChange}
-        />
                                 </Table>
                             </Col>
                         </Row>

@@ -14,22 +14,17 @@ const navConfigs = {
     },
     {
       name: "Tạo tài khoản",
-      url: "/",
+      url: "/create-account",
       icon: "icon-people",
     },
     {
       name: "Nạp tiền tài khoản",
-      url: "/",
+      url: "/recharge",
       icon: "icon-calendar",
     },
     {
       name: "Lịch sử giao dịch",
       url: "/transaction",
-      icon: "icon-calendar",
-    },
-    {
-      name: "Nạp tiền tài khoản",
-      url: "/",
       icon: "icon-calendar",
     }
   ],

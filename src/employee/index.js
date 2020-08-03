@@ -9,6 +9,9 @@ import Login from './../login/index';
 import Logout from './../logout/index';
 import Home from './home/index';
 import Transaction from './transaction/index';
+import CreateAccount from './create_account/index';
+import RechargeAccount from './recharge/index';
+
 
 import fakeAuth from './../auth';
 
@@ -30,7 +33,9 @@ export default class Employee extends React.Component {
     {/* Phần Navbar */}
     <Switch>
       <PrivateRoute exact path = "/" component = {Header} />
-      <PrivateRoute exact path = "/transaction" component = {Header} />      
+      <PrivateRoute exact path = "/transaction" component = {Header} />
+      <PrivateRoute exact path = "/create-account" component = {Header} />
+      <PrivateRoute exact path = "/recharge" component = {Header} />
       <PrivateRoute exact path = "/error-404" component = {Header} />
       <Route path = "/login"/>
       <Redirect to="/error-404" />
@@ -39,7 +44,9 @@ export default class Employee extends React.Component {
     {/* Phần body */}
     <Switch>
       <PrivateRoute exact path = "/" component = {Home} />
-      <PrivateRoute exact path = "/transaction" component = {Transaction} />      
+      <PrivateRoute exact path = "/transaction" component = {Transaction} />
+      <PrivateRoute exact path = "/create-account" component = {CreateAccount} />   
+      <PrivateRoute exact path = "/recharge" component = {RechargeAccount} />   
       <PrivateRoute exact path = "/error-404" component = {NotFound} />
       <Route path = "/login" component = {Login} />
       <Route path = "/logout" component = {Logout} />
