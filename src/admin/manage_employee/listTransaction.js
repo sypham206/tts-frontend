@@ -191,7 +191,7 @@ export default class TransactionForm extends React.Component {
                                     fontSize: '20px',
                                     textDecoration: 'underline overline'
                                 }
-                            }>Lịch sử giao dịch</strong>
+                            }>Quản lý nhân viên</strong>
                         </Label>
                     </Col>
 

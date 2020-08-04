@@ -8,6 +8,8 @@ import NotFound from './notfound/index';
 import Login from './../login/index';
 import Logout from './../logout/index';
 import Home from './home/index';
+import Transaction from './transaction/index';
+import ManageEmployee from './manage_employee/index';
 import fakeAuth from './../auth';
 
 // Kiểm tra quyền đăng nhập
@@ -28,6 +30,8 @@ export default class Admin extends React.Component {
     {/* Phần Navbar */}
     <Switch>
       <PrivateRoute exact path = "/" component = {Header} />
+      <PrivateRoute exact path = "/transaction" component = {Header} />
+      <PrivateRoute exact path = "/manage-employee" component = {Header} />
       <PrivateRoute exact path = "/error-404" component = {Header} />
       <Route path = "/login"/>
       <Redirect to="/error-404" />
@@ -37,6 +41,8 @@ export default class Admin extends React.Component {
     <Switch>
       <PrivateRoute exact path = "/" component = {Home} />
       <PrivateRoute exact path = "/error-404" component = {NotFound} />
+      <PrivateRoute exact path = "/transaction" component = {Transaction} />
+      <PrivateRoute exact path = "/manage-employee" component = {ManageEmployee} />   
       <Route path = "/login" component = {Login} />
       <Route path = "/logout" component = {Logout} />
       <Redirect to="/error-404" />

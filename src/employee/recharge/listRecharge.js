@@ -58,13 +58,14 @@ export default class RechargeForm extends React.Component {
             // if (response.data.message == 'Tạo thành công') {
             if (true) {
                 // Chuyển qua tab thông báo
+                alert(response.data.status);
                 this.setState({activeTab: 3})
             } else {
-                alert('Tạo thất bại!');
+                alert('Nạp tài khoản thất bại!');
             }
         }, (error) => {
-            console.log("Error! Tạo mới khách hàng: ", error.response);
-            alert('Tạo thất bại!');
+            console.log("Error! Nạp tài khoản khách hàng: ", error.response);
+            alert('Lỗi nạp tài khoản thất bại!');
         });
     }
 
@@ -75,7 +76,7 @@ export default class RechargeForm extends React.Component {
 
             <div className="animated fadeIn">
                 <FormGroup row>
-                    <Col md="3" className="d-flex p-3">
+                    <Col md="12" className="d-flex p-3">
                         <Label htmlFor="numberCustomer"><GiHistogram style={
                                 {
                                     fontSize: '24px',
@@ -88,7 +89,7 @@ export default class RechargeForm extends React.Component {
                                     fontSize: '20px',
                                     textDecoration: 'underline overline'
                                 }
-                            }>Tạo tài khoản</strong>
+                            }>Nạp tài khoản</strong>
                         </Label>
                     </Col>
                 </FormGroup>
@@ -119,15 +120,15 @@ export default class RechargeForm extends React.Component {
                                 <CardBody>
                                     <FormGroup row>
                                         <Col md="3" className="d-flex p-3">
-                                            <Label htmlFor="username">Số tài khoản</Label>
+                                            <Label htmlFor="account_number">Số tài khoản</Label>
                                         </Col>
                                         <Col xs="12" md="6">
-                                            <Input type="text" name="username"
+                                            <Input type="text" name="account_number"
                                                 onChange={
                                                     this.onChange
                                                 }
                                                 value={
-                                                    this.state.username
+                                                    this.state.account_number
                                             }></Input>
                                         </Col>
                                     </FormGroup>

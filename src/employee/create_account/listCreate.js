@@ -86,7 +86,7 @@ export default class CreateForm extends React.Component {
 
             <div className="animated fadeIn">
                 <FormGroup row>
-                    <Col md="3" className="d-flex p-3">
+                    <Col md="12" className="d-flex p-3">
                         <Label htmlFor="numberCustomer"><GiHistogram style={
                                 {
                                     fontSize: '24px',
