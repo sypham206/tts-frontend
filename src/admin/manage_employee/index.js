@@ -5,7 +5,7 @@ import * as router from "react-router-dom";
 import { Container } from "reactstrap";
 import { AppHeader, AppBreadcrumb, AppSidebar, AppSidebarNav2, AppSidebarMinimizer } from "@coreui/react";
 import Sidebar from '../sidebar';
-import ListTransaction from './listTransaction';
+import ListEmployee from './listEmployee';
 
 export default class Home extends React.Component {
     render() {
@@ -17,7 +17,7 @@ export default class Home extends React.Component {
                 {/* Content */}
                 <main className="main">
                   <div>
-                    <title>Transaction Info</title>
+                    <title>Manage Employee</title>
                       <meta charSet="UTF-8" />
                       <meta name="viewport" content="width=device-width, initial-scale=1" />
                       {/*===============================================================================================*/}	
@@ -28,7 +28,7 @@ export default class Home extends React.Component {
                         <div className="container-pages-accountinfo">
                           
                           <div className="wrap-body-unique">
-                            <ListTransaction/>
+                            <ListEmployee/>
                           </div>
                           
                         </div>
