@@ -272,7 +272,6 @@ export default class TransferForm extends React.Component {
                 console.log("Error! Infor: ", error.response);
                 const loi = 'Lỗi xảy ra. accessToken: ';
                 const str = loi.concat(localStorage.getItem("accessToken"));
-                alert(str);
             });
 
             // Call axios - listReceivers

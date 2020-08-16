@@ -10,11 +10,11 @@ import {
     CardHeader
 } from "reactstrap";
 
-export default class accountsComponent extends React.Component {
+export default class notifiesComponent extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            listAccounts: [],
+            listNotifies: [],
             loaded: false,
             lasttime: new Date().getTime()
         }
@@ -26,16 +26,23 @@ export default class accountsComponent extends React.Component {
             this.setState({loaded: true, lasttime: new Date().getTime()})
             DB.refreshToken();
             // Call axios
-            const response = await connector.get("/account", {}).then((response) => {
+            const response = await connector.post(`/notify/all/`, {}).then((response) => {
                 console.log("response", response);
-                const listAccounts = [{
-                        number: response.data.rows.account_number,
-                        balance: response.data.rows.balance,
-                        type: "Tài khoản thanh toán"
-                    }];
+                    let listNotifies = [];
+                    response.data.rows.forEach(element => {
+                            listNotifies = listNotifies.concat([{
+                                notify_id: element.notify_id,
+                                sender_account_number: element.sender_account_number,
+                                sender_fullname : element.sender_fullname,
+                                receiver_account_number: element.receiver_account_number,
+                                receiver_fullname: element.receiver_fullname,
+                                message: element.message,
+                                created_at: element.created_at
+                        }]);
+                });
 
                 // Lưu vào state
-                this.setState({listAccounts: listAccounts})
+                this.setState({listNotifies: listNotifies})
             }, (error) => {
                 console.log("Error! Infor: ", error.response);
                 const loi = 'Lỗi xảy ra. accessToken: ';
@@ -65,7 +72,7 @@ export default class accountsComponent extends React.Component {
                             fontSize: '18px'
                         }
                     }>
-                        <strong>Danh sách tài khoản</strong>
+                        <strong>Thông báo của bạn</strong>
                     </CardHeader>
                     <CardBody style={
                         {
@@ -78,29 +85,17 @@ export default class accountsComponent extends React.Component {
                                 <Table responsive bordered>
                                     <thead>
                                         <tr>
-                                            <th>#</th>
-                                            <th>Số tài khoản</th>
-                                            <th>Số dư</th>
-                                            <th>Loại tài khoản</th>
+                                            <th>____________________________________________________________</th>
                                         </tr>
                                     </thead>
                                     <tbody> {
-                                        this.state.listAccounts.map((item, index) => {
+                                        this.state.listNotifies.map((item, index) => {
                                             return (
                                                 <tr>
                                                     <th scope="row">
                                                         {
-                                                        index + 1
-                                                    }</th>
-                                                    <td> {
-                                                        item.number
-                                                    }</td>
-                                                    <td> {
-                                                        item.balance
-                                                    }</td>
-                                                    <td> {
-                                                        item.type
-                                                    }</td>
+                                                        item.message
+                                                        }<br/>{item.created_at}</th>
                                                 </tr>
                                             )
                                         })

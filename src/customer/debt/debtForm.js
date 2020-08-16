@@ -30,6 +30,8 @@ export default class debtsComponent extends React.Component {
         super(props)
         this.state = {
             activeTab: 0,
+            activeAddTab: 0,
+            activePayTab: 0,
             numberReceiver: null,
             nameReceiver: '',
             money: null,
@@ -46,7 +48,11 @@ export default class debtsComponent extends React.Component {
             codeTransaction2: '',
             idTransaction2: null,
             notify_message: '',
-            otp: ''
+            otp_id: '',
+            otp: '',
+            email: '',
+            notify_id: '',
+            debt_id_pay: ''
         }
         this.onChange = this.onChange.bind(this);
         this.selectReceiverChange = this.selectReceiverChange.bind(this);
@@ -72,7 +78,6 @@ export default class debtsComponent extends React.Component {
                 this.setState({nameReceiver: nameReceiver})
             }, (error) => {
                 console.log("Error! Infor: ", error.response);
-                alert('Lỗi xảy ra ở transForm.js 70!');
             });
 
             // value = 0 ứng với option gợi ý (dòng 155)
@@ -93,7 +98,6 @@ export default class debtsComponent extends React.Component {
             this.setState({nameReceiver: nameReceiver, numberReceiver: numberReceiver})
         }, (error) => {
             console.log("Error! Infor: ", error.response);
-            alert('Lỗi xảy ra!');
         });
     }
 
@@ -101,17 +105,24 @@ export default class debtsComponent extends React.Component {
         this.setState({activeTab: val})
     }
 
-    actionPay = async (idTransaction, codeTransaction) => { // Open form
+    actionPay = async (debt_id) => { // Open form
         const {formID} = document.forms;
         formID.reset();
-        document.getElementById('formPay').style.display = "block";
 
         // Gửi yêu cầu để lấy mã OTP cho form Pay
-        /* .. code here .. */
-
-        // Lấy giá trị STK
-        this.setState({idTransaction1: idTransaction, codeTransaction1: codeTransaction, otp: ''});
-        document.getElementById('formPay').focus();
+        const reqBody = {
+            debt_id: `${debt_id}`
+        }
+        const response = await connector.post(`/transfer-debt`, reqBody).then((response) => {
+            console.log("response", response);
+            if (response.data.status == 'OK') {
+                this.setState({activePayTab: 0, otp_id: response.data.data.otp_id, email: response.data.data.email, otp: '', debt_id_pay: debt_id});
+                document.getElementById('formPay').style.display = "block";
+                window.scrollTo(0, 300);
+            }
+        }, (error) => {
+            console.log("Error! Lấy OTP thanh toán nhắc nợ: ", error.response);
+        });
     }
 
     ActionCancelPayForm(e) {
@@ -121,31 +132,39 @@ export default class debtsComponent extends React.Component {
     }
 
     submitPayForm = async (e) => {
-        e.preventDefault()
-        // Thanh toán ..
+        e.preventDefault();
 
-        /* Chưa tìm thấy .. */
+        // Xử lí
+        const {email, otp_id} = this.state;
         const reqBody = {
-            notify_message: this.state.notify_message
+            otp: this.state.otp,
+            debt_id : this.state.debt_id_pay
         }
-
-        const response = await connector.post(`/debt/delete1/${
-            this.state.idTransaction1
-        }`, reqBody).then((response) => {
+        connector.interceptors.request.use(function (config) {
+            const accessToken = localStorage.getItem("accessToken");
+            if (accessToken) {
+                config.headers["x-access-token"] = accessToken;
+                config.headers["otp_id"] = otp_id;
+                config.headers["email"] = email;
+            }
+            console.log(config);
+            return config;
+        }, function (error) {
+            console.log(error);
+            return Promise.reject(error);
+        });
+        const response = await connector.post(`/transfer-debt/confirm`, reqBody).then((response) => {
             console.log("response", response);
-            if (response.data.message == 'OK') { // Show message
-                alert('Xóa thành công!');
+            if (response.data.status == 'DONE') { // Chuyển sang màn hình giao dịch thành công
+                this.setState({activePayTab: 1, notify_id: response.data.notify_id});
+                window.scrollTo(0, 0);
             } else {
-                alert('Xóa thất bại!');
+                alert('Giao dịch thất bại');
             }
         }, (error) => {
-            console.log("Error! Xóa nhắc nợ: ", error.response);
-            alert('Lỗi xóa thất bại!');
+            document.getElementById('formPay').style.display = "none";
+            console.log("Error transfer debt! Infor: ", error.response);
         });
-
-        this.getDatabase();
-        // Đóng form
-        document.getElementById('formDelete1').style.display = "none";
     }
 
     actionDelete1 = async (idTransaction, codeTransaction) => { // Open form
@@ -177,14 +196,13 @@ export default class debtsComponent extends React.Component {
             this.state.idTransaction1
         }`, reqBody).then((response) => {
             console.log("response", response);
-            if (response.data.message == 'OK') { // Show message
+            if (response.data.status == 'OK') { // Show message
                 alert('Xóa thành công!');
             } else {
-                alert('Xóa thất bại!');
+                // alert('Xóa thất bại!');
             }
         }, (error) => {
             console.log("Error! Xóa nhắc nợ: ", error.response);
-            alert('Lỗi xóa thất bại!');
         });
 
         this.getDatabase();
@@ -221,14 +239,13 @@ export default class debtsComponent extends React.Component {
             this.state.idTransaction2
         }`, reqBody).then((response) => {
             console.log("response", response);
-            if (response.data.message == 'OK') { // Show message
+            if (response.data.status == 'OK') { // Show message
                 alert('Xóa thành công!');
             } else {
-                alert('Xóa thất bại!');
+                // alert('Xóa thất bại!');
             }
         }, (error) => {
             console.log("Error! Xóa nhắc nợ: ", error.response);
-            alert('Lỗi xóa thất bại!');
         });
 
         this.getDatabase();
@@ -238,7 +255,8 @@ export default class debtsComponent extends React.Component {
 
     ActionAdd(e) {
         e.preventDefault();
-        this.setState({activeTab: 0});
+        // Mở và xóa rỗng form thêm nhắc nợ
+        this.setState({activeAddTab: 0, numberReceiver: '', nameReceiver : '', money: null, message : ''});
         const {formID} = document.forms;
         formID.reset();
         document.getElementById('formAdd').style.display = "block";
@@ -260,14 +278,13 @@ export default class debtsComponent extends React.Component {
             }
         }, (error) => {
             console.log("Error! Gửi nhắc nợ: ", error.response);
-            alert('Lỗi gửi nhắc nợ!');
         });
 
         // Cập nhật dữ liệu
         this.getDatabase();
 
         // Chuyển qua màn hình thông báo
-        this.setState({activeTab: 1});
+        this.setState({activeAddTab: 1});
     }
 
 
@@ -298,7 +315,6 @@ export default class debtsComponent extends React.Component {
                 this.setState({listReceivers: listReceivers})
             }, (error) => {
                 console.log("Error! Infor: ", error.response);
-                alert('Lỗi xảy ra!');
             });
             const response1 = await connector.get("/debt/view1", {}).then((response) => {
                 console.log("response", response);
@@ -319,7 +335,6 @@ export default class debtsComponent extends React.Component {
                 this.setState({listDebts1: listDebts1})
             }, (error) => {
                 console.log("Error! Infor: ", error.response);
-                alert('Lỗi xảy ra (view1)!');
             });
             const response2 = await connector.get("/debt/view2", {}).then((response) => {
                 console.log("response", response);
@@ -340,7 +355,6 @@ export default class debtsComponent extends React.Component {
                 this.setState({listDebts2: listDebts2})
             }, (error) => {
                 console.log("Error! Infor: ", error.response);
-                alert('Lỗi xảy ra (view2)!');
             });
         }
     }
@@ -348,9 +362,9 @@ export default class debtsComponent extends React.Component {
     render = () => { // Realtime
         if (this.state.loaded == false)
             this.getDatabase();
-        // setTimeout(function () {
-        //     this.getDatabase();
-        // }.bind(this), 10 * 1000);
+        setTimeout(function () {
+            this.getDatabase();
+        }.bind(this), 10 * 1000);
 
         // Tải lên giao diện
         return (
@@ -432,7 +446,7 @@ export default class debtsComponent extends React.Component {
                                             <Table responsive bordered>
                                                 <thead>
                                                     <tr>
-                                                        <th>Mã giao dịch</th>
+                                                        <th>ID</th>
                                                         <th>Chủ khoản</th>
                                                         <th>Số tài khoản</th>
                                                         <th>Số tiền</th>
@@ -458,7 +472,7 @@ export default class debtsComponent extends React.Component {
                                                                             }
                                                                     }>
                                                                         {
-                                                                        item.code
+                                                                        item.id
                                                                     }</a>
                                                                 </th>
                                                                 <td> {
@@ -502,7 +516,7 @@ export default class debtsComponent extends React.Component {
                                             <Table responsive bordered>
                                                 <thead>
                                                     <tr>
-                                                        <th>Mã giao dịch</th>
+                                                        <th>ID</th>
                                                         <th>Chủ khoản</th>
                                                         <th>Số tài khoản</th>
                                                         <th>Số tiền</th>
@@ -528,7 +542,7 @@ export default class debtsComponent extends React.Component {
                                                                             }
                                                                     }>
                                                                         {
-                                                                        item.code
+                                                                        item.id
                                                                     }</a>
                                                                 </th>
                                                                 <td> {
@@ -547,7 +561,7 @@ export default class debtsComponent extends React.Component {
                                                                     {textAlign: 'center'}
                                                                 }>
                                                                     <button onClick={
-                                                                            this.actionPay
+                                                                            () => this.actionPay(item.id)
                                                                         }
                                                                         style={
                                                                             {
@@ -598,7 +612,7 @@ export default class debtsComponent extends React.Component {
                         }
                 }>
                     <TabContent activeTab={
-                        this.state.activeTab
+                        this.state.activeAddTab
                     }>
                         <TabPane tabId={0}>
                             <Card style={
@@ -1013,7 +1027,11 @@ export default class debtsComponent extends React.Component {
                             transform: 'translate(-50%,-50%)'
                         }
                 }>
-                    <Form id={'formID'}
+                    <TabContent activeTab={
+                        this.state.activePayTab
+                    }>
+                        <TabPane tabId={0}>
+                        <Form id={'formID'}
                         onSubmit={
                             this.submitPayForm
                     }>
@@ -1029,7 +1047,7 @@ export default class debtsComponent extends React.Component {
                                         color: 'red'
                                     }
                                 }>{
-                                    this.state.codeTransaction1
+                                    this.state.debt_id_pay
                                 }</u></b>
                             </CardHeader>
                             <CardBody>
@@ -1064,8 +1082,82 @@ export default class debtsComponent extends React.Component {
                             }>ĐÓNG</Button>
                         </div>
                     </Form>
-                </div>
+                    </TabPane>
+                        <TabPane tabId={1}>
+                            <Card style={
+                                {
+                                    backgroundColor: 'green',
+                                    textAlign: 'center',
+                                    color: 'white',
+                                    fontSize: '18px'
+                                }
+                            }>
+                                <strong style={
+                                    {fontSize: '22px'}
+                                }>Chi tiết giao dịch</strong>
+                            </Card>
+                            <br/>
+                            <Form onSubmit={
+                                    this.submitForm
+                                }
+                                style={
+                                    {textAlign: 'left'}
+                            }>
+                                <FormGroup>
+                                    <Card>
+                                        <CardBody>
+                                            <Label>
+                                                <b style={
+                                                    {color: 'green'}
+                                                }>Tình trạng</b>
+                                            </Label>
+                                            <br/>
+                                            <Label>• Thanh toán nhắc nợ thành công</Label>
+                                        </CardBody>
+                                    </Card>
+                                </FormGroup>
+                                <FormGroup>
+                                    <Card>
+                                        <CardBody>
+                                            <Label>
+                                                <b style={
+                                                    {color: 'green'}
+                                                }>Thông tin giao dịch</b>
+                                            </Label>
+                                            <br/>
+                                            <Label>• Notify ID:
+                                                    <b style={
+                                                        {fontSize: '13px'}
+                                                    }>
+                                                        {
+                                                        ` ${
+                                                            this.state.notify_id
+                                                        }`
+                                                    }</b>
+                                            </Label>
+                                            <br/>
+                                            <Label>• {
+                                                this.state.time
+                                            }</Label>
+                                        </CardBody>
+                                    </Card>
+                                </FormGroup>
+                                <br/>
+                                <div style={
+                                    {textAlign: 'center'}
+                                }>
+                                    <Button onClick={
+                                            this.ActionCancelPayForm
+                                        }
+                                        style={
+                                            {marginLeft: '5px'}
+                                    }>ĐÓNG</Button>
+                                </div>
+                            </Form>
+                        </TabPane>
+                    </TabContent>
                 
+                </div>
             </div>
         );
     }

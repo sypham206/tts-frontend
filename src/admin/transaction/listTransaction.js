@@ -29,10 +29,32 @@ export default class TransactionForm extends React.Component {
             loaded: false,
             lasttime: new Date().getTime(),
             transAll: [],
-            type: 1
+            type: 1,
+            total_money: 0
         }
         this.onChange = this.onChange.bind(this);
         this.selectBankChange = this.selectBankChange.bind(this);
+    }
+
+    moneyToString = (money) => {
+        let _money = money;
+        let moneyString = '';
+        if (_money < 1000) {
+            moneyString = `${_money}`;           
+        }
+        else {
+            while(_money >= 1000) {
+                // Chia 1 nghìn
+                const end = _money % 1000;
+                let stringEnd = `.${end}`;
+                if (end<100) stringEnd = `.0${end}`;
+                if (end<10) stringEnd = `.00${end}`;
+                moneyString = moneyString.concat(stringEnd);
+                _money = parseInt(_money/1000);
+            }
+            moneyString = `${_money}`.concat(moneyString);
+        }
+        return moneyString;
     }
 
     onChange = async (e) => {
@@ -53,6 +75,8 @@ export default class TransactionForm extends React.Component {
 
 
     filter = async (e) => {
+        DB.refreshToken();
+
         const reqBody = {
             start: this.state.start,
             end: this.state.end,
@@ -61,7 +85,8 @@ export default class TransactionForm extends React.Component {
         const response = await connector.post(`/transaction/admin2/`, reqBody).then((response) => {
             if (response.data.status == 'OK') {
                 console.log("response", response);
-                let transAll = []; 
+                let transAll = [];
+                let total_money = 0;
                 response.data.data.forEach(item => {
                     transAll = transAll.concat([{
                         transaction_id: item.transaction_id,
@@ -72,10 +97,11 @@ export default class TransactionForm extends React.Component {
                         money: item.money,
                         message: item.message, // Nội dung cần chuyển, Ví dụ: "gửi trả nợ cho ông A"
                         created_at: item.created_at
-                    }])                    
+                    }]);
+                    total_money += item.money;
                 })
                 
-                this.setState({transAll: transAll})
+                this.setState({transAll: transAll, total_money: total_money})
             }
         }, (error) => {
             console.log("Error! Infor: ", error.response);
@@ -198,7 +224,12 @@ export default class TransactionForm extends React.Component {
                             borderColor: '#435d7d'
                         }
                     }>
-
+                        <Label style={
+                                {marginLeft: '3px'}
+                            }
+                            htmlFor="selectBank">
+                            <b>{`Tổng số tiền giao dịch: ${this.moneyToString(this.state.total_money)} VNĐ`}</b>
+                        </Label>
                         <Row>
                             <Col>
                                 <Table responsive bordered>
