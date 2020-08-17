@@ -523,9 +523,19 @@ iframe {
 /*//////////////////////////////////////////////////////////////////
 [ Responsive ]*/
 
-@media (max-width: 576px) {
+@media (max-width: 1200px) {
   .wrap-body {
     padding-left: 15px;
     padding-right: 15px;
+  }
+  .wrap-body-left {
+    display: none;
+  }
+  .wrap-body-right {
+    display: none;
+  }
+  .wrap-body-main {
+    width: 100%;
+    font-size: 12px;
   }
 }

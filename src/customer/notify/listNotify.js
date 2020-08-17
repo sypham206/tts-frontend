@@ -30,14 +30,26 @@ export default class notifiesComponent extends React.Component {
                 console.log("response", response);
                     let listNotifies = [];
                     response.data.rows.forEach(element => {
-                            listNotifies = listNotifies.concat([{
-                                notify_id: element.notify_id,
-                                sender_account_number: element.sender_account_number,
-                                sender_fullname : element.sender_fullname,
-                                receiver_account_number: element.receiver_account_number,
-                                receiver_fullname: element.receiver_fullname,
-                                message: element.message,
-                                created_at: element.created_at
+                        const notify_type = element.notify_type;
+                        let notify_content = '';
+                        if (notify_type == '0')
+                        {
+                            notify_content = `${element.sender_fullname} (${element.sender_account_number}) đã hủy nhắc nợ của bạn.`;
+                        }
+                        if (notify_type == '1')
+                        {
+                            notify_content = `${element.sender_fullname} (${element.sender_account_number}) đã thanh toán nhắc nợ của bạn.`;
+                        }
+                        listNotifies = listNotifies.concat([{
+                            notify_id: element.notify_id,
+                            sender_account_number: element.sender_account_number,
+                            sender_fullname : element.sender_fullname,
+                            receiver_account_number: element.receiver_account_number,
+                            receiver_fullname: element.receiver_fullname,
+                            message: element.message,
+                            created_at: element.created_at,
+                            notify_type: element.notify_type,
+                            notify_content: notify_content
                         }]);
                 });
 
@@ -85,17 +97,18 @@ export default class notifiesComponent extends React.Component {
                                 <Table responsive bordered>
                                     <thead>
                                         <tr>
-                                            <th>____________________________________________________________</th>
+                                            <th style = {{textAlign: "center"}}>--------===-===--------</th>
                                         </tr>
                                     </thead>
                                     <tbody> {
                                         this.state.listNotifies.map((item, index) => {
                                             return (
                                                 <tr>
-                                                    <th scope="row">
-                                                        {
-                                                        item.message
-                                                        }<br/>{item.created_at}</th>
+                                                    <th scope="row" style = {{fontFamily: "Segoe UI"}}>
+                                                        <a href = {`/debt`}><b>{item.notify_content}</b></a>                                                        
+                                                        <p style = {{fontSize: "13px"}}><br/>{item.message}</p>                                                        
+                                                        <i><u style = {{fontSize: "12px"}}>{item.created_at}</u></i>
+                                                    </th>
                                                 </tr>
                                             )
                                         })

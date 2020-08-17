@@ -142,12 +142,12 @@ export default class Nav extends Component {
                                 </li>
                                 <li className="nav-item">
                                     <a href="/debt" className="nav-link">Nhắc nợ</a>
-                                </li>
-                                <li className="nav-item">
-                                    <a href="" className="nav-link">Tiết kiệm</a>
-                                </li>
+                                </li>                                
                                 <li className="nav-item">
                                     <a href="/transaction" className="nav-link">Lịch sử giao dịch</a>
+                                </li>
+                                <li className="nav-item">
+                                    <a href="/logout" className="nav-link">Đăng xuất</a>
                                 </li>
                                 <li className="nav-item">
                                     <a href="/notify" className="nav-link"><b style = {{color: 'red'}}>

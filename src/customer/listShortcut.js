@@ -70,7 +70,7 @@ const listShortcut = () => {
             <ListGroup style={{fontSize: '14px'}}>
               <ListGroupItem><Badge pill>{'>'} </Badge> <a href="/change_password" style={{color:'#6c757d'}}>Đổi mật khẩu</a></ListGroupItem>
               <ListGroupItem><Badge pill>{'>'} </Badge> <a href="/transaction" style={{color:'#6c757d'}}>Lịch sử giao dịch</a></ListGroupItem>
-              <ListGroupItem><Badge pill>{'>'} </Badge> Cài đặt hạn mức</ListGroupItem>
+              <ListGroupItem><Badge pill>{'>'} </Badge> <a href="/notify" style={{color:'#6c757d'}}>Trung tâm thông báo</a></ListGroupItem>
               <ListGroupItem><Badge pill>{'>'} </Badge> Hỗ trợ</ListGroupItem>
               <ListGroupItem><Badge pill>{'>'} </Badge> Khác</ListGroupItem>
             </ListGroup>   

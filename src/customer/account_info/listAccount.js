@@ -15,6 +15,7 @@ export default class accountsComponent extends React.Component {
         super(props)
         this.state = {
             listAccounts: [],
+            listSavingAccounts: [],
             loaded: false,
             lasttime: new Date().getTime()
         }
@@ -25,7 +26,7 @@ export default class accountsComponent extends React.Component {
         if (new Date().getTime() > this.state.lasttime + 5 * 1000 || this.state.loaded == false) {
             this.setState({loaded: true, lasttime: new Date().getTime()})
             DB.refreshToken();
-            // Call axios
+            // Accounts
             const response = await connector.get("/account", {}).then((response) => {
                 console.log("response", response);
                 const listAccounts = [{
@@ -36,6 +37,23 @@ export default class accountsComponent extends React.Component {
 
                 // Lưu vào state
                 this.setState({listAccounts: listAccounts})
+            }, (error) => {
+                console.log("Error! Infor: ", error.response);
+                const loi = 'Lỗi xảy ra. accessToken: ';
+                const str = loi.concat(localStorage.getItem("accessToken"));
+            });
+
+            // SavingAccounts
+            const response1 = await connector.get("/account-saving", {}).then((response) => {
+                console.log("response", response);
+                const listSavingAccounts = [{
+                        number: response.data.rows.saving_account_number,
+                        balance: response.data.rows.balance,
+                        type: "Tài khoản tiết kiệm"
+                    }];
+
+                // Lưu vào state
+                this.setState({listSavingAccounts: listSavingAccounts})
             }, (error) => {
                 console.log("Error! Infor: ", error.response);
                 const loi = 'Lỗi xảy ra. accessToken: ';
@@ -85,7 +103,7 @@ export default class accountsComponent extends React.Component {
                                         </tr>
                                     </thead>
                                     <tbody> {
-                                        this.state.listAccounts.map((item, index) => {
+                                        this.state.listAccounts.concat(this.state.listSavingAccounts).map((item, index) => {
                                             return (
                                                 <tr>
                                                     <th scope="row">
