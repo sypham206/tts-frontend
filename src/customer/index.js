@@ -15,6 +15,7 @@ import InterTransfer from './inter_transfer/index';
 import Debt from './debt/index';
 import Notify from './notify/index';
 import Transaction from './transaction/index';
+import DetailTransaction from './transaction_detail/index';
 import ChangePassword from './change_password/index';
 
 import fakeAuth from './../auth';
@@ -61,7 +62,7 @@ export default class Admin extends React.Component {
       <PrivateRoute exact path = "/inter_transfer" component = {InterTransfer} />
       <PrivateRoute exact path = "/debt" component = {Debt} />
       <PrivateRoute exact path = "/notify" component = {Notify} />
-      <PrivateRoute exact path = "/transaction/detail" component = {Debt} />
+      <PrivateRoute exact path = "/transaction/detail" component = {DetailTransaction} />
       <PrivateRoute exact path = "/transaction" component = {Transaction} />
       <PrivateRoute exact path = "/change_password" component = {ChangePassword} />
       <Route path = "/login" component = {Login} />

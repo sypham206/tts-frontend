@@ -13,9 +13,9 @@ import './../../css/util.css';
 import './../../css/main.css';
 // Import listExample
 import ListShortcut from './../listShortcut';
-import ListNotify from './listNotify';
+import DetailTransaction from './detailTransaction';
 
-export default class AccountInfo extends React.Component {
+export default class Transaction extends React.Component {
     logOut(e) {
       window.location.replace('/logout');
     }
@@ -23,7 +23,7 @@ export default class AccountInfo extends React.Component {
     render() {
         return (
           <div>
-      <title>Notify</title>
+      <title>Transaction Detail</title>
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         {/*===============================================================================================*/}	
@@ -36,7 +36,7 @@ export default class AccountInfo extends React.Component {
             <ListShortcut/>
               </div>
             <div className="wrap-body-main p-l-85 p-r-85 p-t-55 p-b-55">
-              <ListNotify/>
+              <DetailTransaction/>
             </div>
             <div className="wrap-body-right">
             <div>

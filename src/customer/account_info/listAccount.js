@@ -114,7 +114,7 @@ export default class accountsComponent extends React.Component {
                                                         item.number
                                                     }</td>
                                                     <td> {
-                                                        item.balance
+                                                        DB.moneyToString(item.balance).concat(" VNĐ")
                                                     }</td>
                                                     <td> {
                                                         item.type

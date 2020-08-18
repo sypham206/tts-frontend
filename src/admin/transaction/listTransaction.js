@@ -36,27 +36,6 @@ export default class TransactionForm extends React.Component {
         this.selectBankChange = this.selectBankChange.bind(this);
     }
 
-    moneyToString = (money) => {
-        let _money = money;
-        let moneyString = '';
-        if (_money < 1000) {
-            moneyString = `${_money}`;           
-        }
-        else {
-            while(_money >= 1000) {
-                // Chia 1 nghìn
-                const end = _money % 1000;
-                let stringEnd = `.${end}`;
-                if (end<100) stringEnd = `.0${end}`;
-                if (end<10) stringEnd = `.00${end}`;
-                moneyString = moneyString.concat(stringEnd);
-                _money = parseInt(_money/1000);
-            }
-            moneyString = `${_money}`.concat(moneyString);
-        }
-        return moneyString;
-    }
-
     onChange = async (e) => {
         this.setState({[e.target.name]: e.target.value})
         // Nếu sự kiện ở thẻ Input Account Receiver thì thay đổi giá trị Name Receiver và làm rỗng thẻ gợi ý
@@ -118,7 +97,6 @@ export default class TransactionForm extends React.Component {
 
         // Return
         return (
-
             <div className="animated fadeIn">
                 <FormGroup row>
                     <Col md="12" className="d-flex p-3">
@@ -228,7 +206,7 @@ export default class TransactionForm extends React.Component {
                                 {marginLeft: '3px'}
                             }
                             htmlFor="selectBank">
-                            <b>{`Tổng số tiền giao dịch: ${this.moneyToString(this.state.total_money)} VNĐ`}</b>
+                            <b>{`Tổng số tiền giao dịch: ${DB.moneyToString(this.state.total_money)} VNĐ`}</b>
                         </Label>
                         <Row>
                             <Col>

@@ -12,6 +12,9 @@ import {
     Label,
     Input
 } from "reactstrap";
+import {
+    useParams
+  } from "react-router-dom";
 
 export default class TransactionForm extends React.Component {
     constructor(props) {
@@ -141,7 +144,7 @@ export default class TransactionForm extends React.Component {
 
     render() { // Realtime
         if (this.state.loaded == false) 
-            this.getDatabase();       
+            this.getDatabase();
         setTimeout(function () {
             this.getDatabase();
         }.bind(this), 10 * 1000);
@@ -193,7 +196,7 @@ export default class TransactionForm extends React.Component {
                             fontSize: '18px'
                         }
                     }>
-                        <strong>Lịch sử giao dịch</strong>
+                        <strong>Chi tiết giao dịch</strong>
                     </CardHeader>
                     <CardBody style={
                         {
@@ -276,9 +279,7 @@ export default class TransactionForm extends React.Component {
                                                             item.message
                                                         }</td>
                                                     </tr>
-                                                );
-                                            
-
+                                                );                                         
                                         })
                                     } </tbody>
                                 </Table>

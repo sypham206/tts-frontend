@@ -22,17 +22,33 @@ const refreshToken = async () => {
         localStorage.setItem('accessToken', response.data.accessToken);
     }, (error) => {
         console.log("Error! Infor: ", error.response);
-        alert('Lỗi xảy ra 0!');
     });
-
-
-
-
     // axios({method: 'post', url: 'https://tts-bank.herokuapp.com/auth/refresh', data: reqBody}).then(function (response) {
     //     localStorage.setItem('accessToken', response.data.accessToken);
     // }).catch(function (error) {
     //     // Handle error
     // })
+}
+
+const moneyToString = (money) => {
+    let _money = money;
+    let moneyString = '';
+    if (_money < 1000) {
+        moneyString = `${_money}`;           
+    }
+    else {
+        while(_money >= 1000) {
+            // Chia 1 nghìn
+            const end = _money % 1000;
+            let stringEnd = `.${end}`;
+            if (end<100) stringEnd = `.0${end}`;
+            if (end<10) stringEnd = `.00${end}`;
+            moneyString = stringEnd.concat(moneyString);
+            _money = parseInt(_money/1000);
+        }
+        moneyString = `${_money}`.concat(moneyString);
+    }
+    return moneyString;
 }
 
 const listBanks = () => [
@@ -305,6 +321,7 @@ const listTransactions = () => [
 
 export default {
     refreshToken,
+    moneyToString,
     listBanks,
     listReceivers,
     listAccounts,

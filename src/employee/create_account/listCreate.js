@@ -28,7 +28,9 @@ export default class CreateForm extends React.Component {
             fullname: '',
             birthday: '',
             phone: '',
-            email: ''
+            email: '',
+            customer_username: '',
+            customer_account: ''
         }
         this.onChange = this.onChange.bind(this);
     }
@@ -48,13 +50,13 @@ export default class CreateForm extends React.Component {
             fullname: this.state.fullname,
             birthday: this.state.birthday,
             phone: this.state.phone,
-            email: this.state.email
+            email: this.state.email,
         }
         const response = await connector.post(`/user/employee/create-customer`, reqBody).then((response) => {
             console.log("response", response);
             if (response.data.message == 'Tạo thành công') {
                 // Chuyển qua tab thông báo
-                this.setState({activeTab: 1})
+                this.setState({activeTab: 1,customer_username: response.data.username, customer_account: response.data.account_number})
             } else {
                 alert('Tạo thất bại!');
             }
@@ -254,7 +256,28 @@ export default class CreateForm extends React.Component {
                                             }>Tạo mới khách hàng thành công</b>
                                         </Label>
                                         <br/>
-                                        <Label>• Quay lại
+                                        <Label>• Tài khoản đăng nhập: 
+                                            <b style={
+                                                    {
+                                                        fontFamily: 'Segoe UI',
+                                                        fontSize: '15px',
+                                                        color: 'blue'
+                                                    }
+                                                }>
+                                                {` ${this.state.customer_username}`}</b>
+                                        </Label>                                        
+                                        <br/><Label>• Số tài khoản: 
+                                            <b style={
+                                                    {
+                                                        fontFamily: 'Segoe UI',
+                                                        fontSize: '15px',
+                                                        color: 'blue'
+                                                    }
+                                                }>
+                                                {` ${this.state.customer_account}`}</b>
+                                        </Label>                                        
+                                        <br/>
+                                        <Label>Quay lại
                                             <a style={
                                                     {
                                                         fontFamily: 'Segoe UI',

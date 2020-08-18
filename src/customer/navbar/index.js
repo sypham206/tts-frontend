@@ -25,35 +25,45 @@ export default class Nav extends Component {
         if (new Date().getTime() > this.state.lasttime + 5 * 1000 || this.state.loaded == false) {
             this.setState({loaded: true, lasttime: new Date().getTime()})
             DB.refreshToken();
-            // Call axios - listAccounts
-            const response = await connector.post(`/notify/all/`, {}).then((response) => {
+            // Lấy danh sánh thông báo
+            const response = await connector.post(`/notify2/all/`, {}).then((response) => {
                 console.log("response", response);
-                let listNotifies = [];
-                response.data.rows.forEach(element => {
-                    listNotifies = listNotifies.concat([{
+                    let listNotifies = [];
+                    let hasNewNotify = 0;
+                    response.data.rows.forEach(element => {
+                        const notify_type = element.notify_type;
+                        let notify_content = '';
+                        if (element.is_view == 0)
+                        {
+                            hasNewNotify += 1;
+                        }
+                        if (notify_type == '0')
+                        {
+                            notify_content = `${element.sender_fullname} (${element.sender_account_number}) đã hủy nhắc nợ của bạn.`;
+                        }
+                        if (notify_type == '1')
+                        {
+                            notify_content = `${element.sender_fullname} (${element.sender_account_number}) đã thanh toán nhắc nợ của bạn.`;
+                        }
+                        listNotifies = listNotifies.concat([{
                             notify_id: element.notify_id,
                             sender_account_number: element.sender_account_number,
-                            sender_fullname: element.sender_fullname,
+                            sender_fullname : element.sender_fullname,
                             receiver_account_number: element.receiver_account_number,
                             receiver_fullname: element.receiver_fullname,
                             message: element.message,
-                            created_at: element.created_at
+                            created_at: element.created_at,
+                            notify_type: element.notify_type,
+                            is_view: element.is_view,
+                            notify_content: notify_content
                         }]);
                 });
-
-                let hasNewNotify = this.state.hasNewNotify;
-                // if(listNotifies.length > this.state.listNotifies.length)
-                if (this.state.listNotifies.length > 0 && listNotifies.length > this.state.listNotifies.length) {
-                    hasNewNotify = listNotifies.length - this.state.listNotifies.length;
-                }
-
-                // Lưu vào state. Chỉ lưu vào listNotifies nếu listNotifies rỗng.
-                this.setState({
-                    listNotifies: this.state.listNotifies.length == 0 ? listNotifies : this.state.listNotifies,
-                    hasNewNotify: hasNewNotify
-                })
+                // Lưu vào state
+                this.setState({listNotifies: listNotifies, hasNewNotify: hasNewNotify})
             }, (error) => {
                 console.log("Error! Infor: ", error.response);
+                const loi = 'Lỗi xảy ra. accessToken: ';
+                const str = loi.concat(localStorage.getItem("accessToken"));
             });
         }
     }
@@ -145,15 +155,14 @@ export default class Nav extends Component {
                                 </li>                                
                                 <li className="nav-item">
                                     <a href="/transaction" className="nav-link">Lịch sử giao dịch</a>
+                                </li>                                
+                                <li className="nav-item">
+                                    <a href="/notify" className="nav-link"  style = {this.state.hasNewNotify?{color: "red"}:{color: "black"}}>
+                                        {
+                                        this.state.hasNewNotify ? `Thông báo mới (${this.state.hasNewNotify})` : `Thông báo mới (${this.state.hasNewNotify})`}</a>
                                 </li>
                                 <li className="nav-item">
                                     <a href="/logout" className="nav-link">Đăng xuất</a>
-                                </li>
-                                <li className="nav-item">
-                                    <a href="/notify" className="nav-link"><b style = {{color: 'red'}}>
-                                        {
-                                        this.state.hasNewNotify ? `Thông báo mới (${this.state.hasNewNotify})` : ``
-                                    }</b></a>
                                 </li>
                             </ul>
                         </div>

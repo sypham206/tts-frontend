@@ -383,9 +383,8 @@ export default class TransferForm extends React.Component {
                                             </Col>
                                             <Col xs="12" md="3">
                                                 <Label>{
-                                                    this.state.balanceAccount + ' '
-                                                }
-                                                    VNĐ</Label>
+                                                    DB.moneyToString(this.state.balanceAccount).concat(" VNĐ")
+                                                }</Label>
                                             </Col>
                                         </FormGroup>
                                     </CardBody>
@@ -519,7 +518,7 @@ export default class TransferForm extends React.Component {
                                                 <Label htmlFor="text-input">Phí thanh toán</Label>
                                             </Col>
                                             <Col xs="12" md="3">
-                                                <Label>3000 VNĐ</Label>
+                                                <Label>3.000 VNĐ</Label>
                                             </Col>
                                         </FormGroup>
                                     </CardBody>
@@ -568,9 +567,8 @@ export default class TransferForm extends React.Component {
                                             }</Label>
                                             <br/>
                                             <Label>• Số dư khả dụng: {
-                                                this.state.balanceAccount
-                                            }
-                                                VNĐ</Label>
+                                                DB.moneyToString(this.state.balanceAccount).concat(" VNĐ")
+                                            }</Label>
                                         </CardBody>
                                     </Card>
                                 </FormGroup>
@@ -603,9 +601,8 @@ export default class TransferForm extends React.Component {
                                             </Label>
                                             <br/>
                                             <Label>• Số tiền chuyển: {
-                                                this.state.money
-                                            }
-                                                VNĐ</Label>
+                                                DB.moneyToString(this.state.money).concat(" VNĐ")
+                                            }</Label>
                                             <br/>
                                             <Label>• Nội dung chuyển: {
                                                 this.state.message
@@ -626,7 +623,7 @@ export default class TransferForm extends React.Component {
                                                 this.state.method
                                             }</Label>
                                             <br/>
-                                            <Label>• Phí thanh toán: 3000 VNĐ</Label>
+                                            <Label>• Phí thanh toán: 3.000 VNĐ</Label>
                                         </CardBody>
                                     </Card>
                                 </FormGroup>
