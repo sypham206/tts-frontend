@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import axios from "axios";
+import ReCAPTCHA from "react-google-recaptcha";
 import './vendor/bootstrap/css/bootstrap.min.css';
 import './fonts/font-awesome-4.7.0/css/font-awesome.min.css';
 import './fonts/Linearicons-Free-v1.0.0/icon-font.min.css';
@@ -40,6 +41,9 @@ export default class Login extends Component {
             'username': username,
             'password': password
         }
+
+        //google captcha
+
 
         axios({method: 'post', url: 'https://tts-bank.herokuapp.com/auth/login', data: reqBody}).then(function (response) {
             if (response.data.authenticated == false) {
@@ -107,6 +111,11 @@ export default class Login extends Component {
                                         }/>
                                     <span className="focus-input100"/>
                                 </div>
+                                <ReCAPTCHA
+                            ref={"6Lc0qcAZAAAAAG_de8hRDZgC3vuMhvY2l7-GeRpw"}
+                            sitekey="6Lc0qcAZAAAAACqgwe0wKAdVJSxnKgUXDQ4vxmeR"
+                            onChange={this.onChangeReCAPTCHA}
+                            />
                                 <div className="flex-sb-m w-full p-b-48">
                                     <div className="contact100-form-checkbox">
                                         <input className="input-checkbox100" id="ckb1" type="checkbox" name="remember-me"/>
