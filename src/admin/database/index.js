@@ -40,9 +40,9 @@ const moneyToString = (money) => {
         while(_money >= 1000) {
             // Chia 1 nghìn
             const end = _money % 1000;
-            let stringEnd = `.${end}`;
-            if (end<100) stringEnd = `.0${end}`;
-            if (end<10) stringEnd = `.00${end}`;
+            let stringEnd = `,${end}`;
+            if (end<100) stringEnd = `,0${end}`;
+            if (end<10) stringEnd = `,00${end}`;
             moneyString = stringEnd.concat(moneyString);
             _money = parseInt(_money/1000);
         }

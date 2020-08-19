@@ -42,27 +42,58 @@ export default class Login extends Component {
             'password': password
         }
 
-        //google captcha
-
-
-        axios({method: 'post', url: 'https://tts-bank.herokuapp.com/auth/login', data: reqBody}).then(function (response) {
-            if (response.data.authenticated == false) {
-                alert('Sai thong tin dang nhap');
-            } else { // Store token
-                localStorage.setItem('accessToken', response.data.accessToken);
-                localStorage.setItem('refreshToken', response.data.refreshToken);
-                // Authen
-                if (response.data.role === 0 || response.data.role === 1 || response.data.role === 2) {
-                    fakeAuth.authenticate(response.data.role);
+        if (this.validRecaptcha() && this.validForm()) {
+            axios({method: 'post', url: 'https://tts-bank.herokuapp.com/auth/login', data: reqBody}).then(function (response) {
+                if (response.data.authenticated == false) {
+                    alert('Sai thông tin đăng nhập!');
+                    window.location.href = '/';
+                } else { // Store token
+                    localStorage.setItem('accessToken', response.data.accessToken);
+                    localStorage.setItem('refreshToken', response.data.refreshToken);
+                    // Authen
+                    if (response.data.role === 0 || response.data.role === 1 || response.data.role === 2) {
+                        fakeAuth.authenticate(response.data.role);
+                    }
+                    // Redirect page
+                    window.location.href = '/';
                 }
-                // Redirect page
+            }).catch(function (error) { //
+                console.log("error_login", error.response);
+            })
+        } else {
+            if (!this.validRecaptcha()) {
+                alert('Vui lòng nhập captcha!');
+            } else if (!this.validForm()) {
+                alert('Vui lòng nhập đầy đủ hông tin đăng nhập!');
+            }
+            // Refresh captcha
+            if (this.validRecaptcha()) {
                 window.location.href = '/';
             }
-        }).catch(function (error) { //
-            console.log("err123", error.response);
-            alert(345);
-        })
-        // connector.interceptors.request.use.apply.apply
+        }
+    }
+
+
+    validRecaptcha(e) { // Get captcha value
+        var captcha = document.querySelector('#g-recaptcha-response').value;
+
+        if (captcha == null) { // Invalid
+            return false;
+        }
+
+        // Return valid
+        return true;
+    }
+
+    validForm(e) { // Condition of form
+        const {username, password} = this.state;
+
+        if (username == '' || username == null || password == '' || password == null) { // Invalid
+            return false;
+        }
+
+        // Return valid
+        return true;
     }
 
     render() {
@@ -98,7 +129,10 @@ export default class Login extends Component {
                                 <span className="txt1 p-b-11">
                                     Mật khẩu
                                 </span>
-                                <div className="wrap-input100 validate-input m-b-12" data-validate="Password is required">
+                                <div className="wrap-input100 validate-input m-b-12" data-validate="Password is required"
+                                    style={
+                                        {marginBottom: "30px"}
+                                }>
                                     <span className="btn-show-pass">
                                         <i className="fa fa-eye"/>
                                     </span>
@@ -111,12 +145,13 @@ export default class Login extends Component {
                                         }/>
                                     <span className="focus-input100"/>
                                 </div>
-                                <ReCAPTCHA
-                            ref={"6Lc0qcAZAAAAAG_de8hRDZgC3vuMhvY2l7-GeRpw"}
-                            sitekey="6Lc0qcAZAAAAACqgwe0wKAdVJSxnKgUXDQ4vxmeR"
-                            onChange={this.onChangeReCAPTCHA}
-                            />
-                                <div className="flex-sb-m w-full p-b-48">
+                                <ReCAPTCHA id="g-recaptcha-response"
+                                    ref={React.createRef()}
+                                    sitekey="6Lc0qcAZAAAAACqgwe0wKAdVJSxnKgUXDQ4vxmeR"
+                                    onChange={
+                                        this.onChangeReCAPTCHA
+                                    }/>
+                                <div className="flex-sb-m w-full p-b-15 p-t-10">
                                     <div className="contact100-form-checkbox">
                                         <input className="input-checkbox100" id="ckb1" type="checkbox" name="remember-me"/>
                                         <label className="label-checkbox100" htmlFor="ckb1">
