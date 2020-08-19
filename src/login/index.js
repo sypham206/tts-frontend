@@ -147,7 +147,7 @@ export default class Login extends Component {
                                 </div>
                                 <ReCAPTCHA id="g-recaptcha-response"
                                     ref={React.createRef()}
-                                    sitekey="6Lc0qcAZAAAAACqgwe0wKAdVJSxnKgUXDQ4vxmeR"
+                                    sitekey="6Lf5jcAZAAAAAJEJBL_Ss4LLgZzIAmQQO3SRyeuM"
                                     onChange={
                                         this.onChangeReCAPTCHA
                                     }/>
