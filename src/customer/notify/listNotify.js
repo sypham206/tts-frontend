@@ -18,10 +18,10 @@ export default class notifiesComponent extends React.Component {
             loaded: false,
             lasttime: new Date().getTime()
         }
-        this.getDatabase = this.getDatabase.bind(this);
+        this.getDatabases = this.getDatabases.bind(this);
     }
 
-    getDatabase = async (e) => { // Refresh token để gọi backend trước
+    getDatabases = async (e) => { // Refresh token để gọi backend trước
         if (new Date().getTime() > this.state.lasttime + 5 * 1000 || this.state.loaded == false) {
             this.setState({loaded: true, lasttime: new Date().getTime()})
             DB.refreshToken();
@@ -79,9 +79,9 @@ export default class notifiesComponent extends React.Component {
 
     render = () => { // Realtime
         if (this.state.loaded == false)
-            this.getDatabase();
+            this.getDatabases();
         setTimeout(function () {
-            this.getDatabase();
+            this.getDatabases();
         }.bind(this), 10 * 1000);
 
         // Tải lên giao diện

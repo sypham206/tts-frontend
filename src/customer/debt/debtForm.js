@@ -156,7 +156,7 @@ export default class debtsComponent extends React.Component {
         const response = await connector.post(`/transfer-debt/confirm`, reqBody).then((response) => {
             console.log("response", response);
             if (response.data.status == 'DONE') { // Chuyển sang màn hình giao dịch thành công
-                this.setState({activePayTab: 1, notify_id: response.data.notify_id});
+                this.setState({activePayTab: 1, notify_id: response.data.notify2_id});
                 window.scrollTo(0, 0);
             } else {
                 alert('Giao dịch thất bại');
