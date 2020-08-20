@@ -643,7 +643,7 @@ export default class TransferForm extends React.Component {
                                                 <Label htmlFor="text-input">Phí thanh toán</Label>
                                             </Col>
                                             <Col xs="12" md="3">
-                                                <Label>3,000 VNĐ</Label>
+                                                <Label>0 VNĐ</Label>
                                             </Col>
                                         </FormGroup>
                                     </CardBody>
@@ -752,7 +752,7 @@ export default class TransferForm extends React.Component {
                                                 this.state.method
                                             }</Label>
                                             <br/>
-                                            <Label>• Phí thanh toán: 3,000 VNĐ</Label>
+                                            <Label>• Phí thanh toán: 0 VNĐ</Label>
                                         </CardBody>
                                     </Card>
                                 </FormGroup>
